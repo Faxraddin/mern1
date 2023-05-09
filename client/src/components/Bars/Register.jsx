@@ -1,66 +1,34 @@
 import React,{useState,useEffect} from "react";
 import {NavLink,useNavigate} from "react-router-dom"
 import axios from "axios";
+import { toast } from "react-hot-toast";
 
 export default function Register(){
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loggedIn, setLoggedIn] = useState(false);
-  const [user, setUser] = useState(null);
+  const navigate = useNavigate()
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Check if user is logged in
-        const res = await axios.get("/api/protected");
-        setUser(res.data);
-        setLoggedIn(true);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchData();
-  }, []);
+  const [data, setData] = useState({
+    name:'',
+    email:'',
+    password:''
+  });
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    try {
-      const res = await axios.post("/api/register", {
-        name,
-        email,
-        password,
-      });
-      setUser(res.data);
-      setLoggedIn(true);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await axios.post("/api/login", {
-        email,
-        password,
-      });
-      setUser(res.data);
-      setLoggedIn(true);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const handleLogout = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.post("/api/logout");
-      setUser(null);
-      setLoggedIn(false);
-    } catch (error) {
-      console.log(error);
+    const {name,email,password} = data
+    try{
+      const {data} = await axios.post('/register',{
+        name,email,password
+      })
+      if (data.error){
+        toast.error(data.error)
+      } else {
+        setData({})
+        toast.success('login successed')
+        navigate('/login')
+      }
+    } catch(error){
+      console.log(error)
     }
   };
 
@@ -84,8 +52,8 @@ export default function Register(){
                 placeholder="e.g Jane Doe"
                 style={{width:'80%',fontSize:'1vw',padding:'.7vw 1vw .7vw 1vw',}}
                 name='firstName'
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={data.name}
+                onChange={(e) => setData({...data,name:e.target.value})}
                 />
             </div>
             <div className="form-group mt-3"style={{display:'flex',alignItems:'center',marginBottom:'.7vw',}}>
@@ -96,8 +64,8 @@ export default function Register(){
                 placeholder="Email Address"
                 style={{width:'80%',fontSize:'1vw',padding:'.7vw 1vw .7vw 1vw',}}
                 name='email'
-                value={email}
-                onChange={e => setEmail(e.target.value)}
+                value={data.email}
+                onChange={(e) => setData({...data,email:e.target.value})}
                 />
             </div>
             <div className="form-group mt-3" style={{display:'flex',alignItems:'center',marginBottom:'.7vw',}}>
@@ -108,14 +76,14 @@ export default function Register(){
                 placeholder="Password"
                 style={{width:'80%',fontSize:'1vw',padding:'.7vw 1vw .7vw 1vw',}}
                 name='password'
-                value={password}
-                onChange={e => setPassword(e.target.value)}
+                value={data.password}
+                onChange={(e) => setData({...data,password:e.target.value})}
                 />
             </div>
         </form>
         
           <div className="d-grid gap-2 mt-3" style={{display:'flex',justifyContent:'center',}}>
-            <button type="submit" className="btn btn-primary" style={{padding:'.7vw 1vw .7vw 1vw',background:'none',width:'30%',fontSize:'.9vw',border:'solid thin lightgrey',boxShadow:' rgb(0 0 0 / 16%) 1px 1px 10px',cursor:'pointer',}}>
+            <button type="submit"  className="btn btn-primary" style={{padding:'.7vw 1vw .7vw 1vw',background:'none',width:'30%',fontSize:'.9vw',border:'solid thin lightgrey',boxShadow:' rgb(0 0 0 / 16%) 1px 1px 10px',cursor:'pointer',}}>
               Submit
             </button>
           </div>
